@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-
-const userSchema = new mongoose.Schema({
+import bcypt from 'bcryptjs';
+;const userSchema = new mongoose.Schema({
     name:{
         type:String,
         required:[true, 'Name is required']
@@ -38,4 +38,23 @@ const userSchema = new mongoose.Schema({
 },{timestamps:true});
 
 const User = mongoose.model('User',userSchema);
+
+
+//presave hook to hash password;
+userSchema.pre('save',async function(next){
+    if(!this.isModified('password')) return next();
+
+    try {
+        const salt = await bcypt.genSalt(10);
+        this.password = await bcypt.hash(this.password,salt);
+        next();
+    } catch (error) {
+        next(error);
+    }
+}
+)
+
+userSchema.methods.comparePassword = async function(password){
+    return bcypt.compare(password, this.password);
+}
 export default User;
