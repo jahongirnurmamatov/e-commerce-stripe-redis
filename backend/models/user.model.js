@@ -37,8 +37,6 @@ import bcypt from 'bcryptjs';
 
 },{timestamps:true});
 
-const User = mongoose.model('User',userSchema);
-
 
 //presave hook to hash password;
 userSchema.pre('save',async function(next){
@@ -57,4 +55,8 @@ userSchema.pre('save',async function(next){
 userSchema.methods.comparePassword = async function(password){
     return bcypt.compare(password, this.password);
 }
+
+
+const User = mongoose.model('User',userSchema);
+
 export default User;
