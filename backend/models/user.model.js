@@ -19,7 +19,7 @@ import bcypt from 'bcryptjs';
     },
     cartItems:[
         {
-            qunatity:{
+            quantity:{
                 type:Number,
                 default:1,
             },
