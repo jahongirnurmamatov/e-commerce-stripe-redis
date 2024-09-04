@@ -1,3 +1,4 @@
+
 import cloudinary from "../lib/cloudinary.js";
 import { redis } from "../lib/redis.js";
 
@@ -12,6 +13,7 @@ export const getAllProducts = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
 
 export const getFeaturedProducts = async (req, res) => {
   try {
@@ -105,5 +107,42 @@ export const getRecommendedProducts = async (req,res)=>{
         res.json(products);
     } catch (error) {
         res.status(500).json({message:"Internal server error in getting recommended products"});
+    }
+}
+export const getProductsByCategory = async(req,res)=>{
+    try {
+        const {cat}=req.params;
+        const products=await Product.find({cat});
+        res.json(products);
+    } catch (error) {
+        console.log('Error in getbycategory ');
+        res.status(500).json({message:error.message});
+    }
+}
+
+export const toggleFeaturedProduct = async(req,res)=>{
+    try {
+        const product = await Product.findById(req.params.id);
+        if(product){
+            product.isFeatured = !product.isFeatured;
+            const updateProduct=await product.save();
+            await updateFeaturedProductCache();
+            res.json(updateProduct);
+        }else{
+            res.status(404).json({message:'Product not found!'});
+        }
+        
+    } catch (error) {
+        console.log('Error in toggleFeaturedProduct controller');
+        res.status(500).json({message:'Server error ',error:error.message});
+    }
+}
+
+async function updateFeaturedProductCache(){
+    try {
+        const featuredProducts = await Product.find({isFeatured:true}).lean();
+        await redis.set('featured_products',JSON.stringify(featuredProducts));
+    } catch (error) {
+        console.log('Error in udpate cache function');
     }
 }
