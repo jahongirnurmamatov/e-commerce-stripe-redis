@@ -1,11 +1,12 @@
 import express from 'express';
-import { createProduct, deleteProduct, getAllProducts, getFeaturedProducts, getProductsByCategory, getRecommendedProducts, toggleFeaturedProduct } from '../controllers/product.controller.js';
-import { adminRoute, protectRoute } from '../../middleware/auth.middleware.js';
+import {  protectRoute } from '../../middleware/auth.middleware.js';
+import { getCoupon, validateCoupon } from '../controllers/coupon.controller.js';
 
 
 const router = express.Router();
 
-
+router.get('/',protectRoute,getCoupon);
+router.get('/validate',protectRoute,validateCoupon);
 
 
 export default router;
